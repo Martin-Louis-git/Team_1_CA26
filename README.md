@@ -114,8 +114,6 @@ Team_1_CA26/
 ```
 
 
-## 19. Execution Flow
-
 ## Execution Flow
 
 The high-level program flow is:
