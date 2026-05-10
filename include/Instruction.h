@@ -1,3 +1,2 @@
 #pragma once
-void encode(char instructions[100][5][5], char encoded[100][33], int size);
-
+void encode(char instructions[][5][5], char encoded[][33], int size);
