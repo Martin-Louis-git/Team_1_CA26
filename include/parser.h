@@ -1,6 +1,4 @@
-#ifndef PARSER_H
-#define PARSER_H
+#pragma once
 
-void parse(char instruction[5][5][5]);
+int parse(char instruction[100][5][5]);
 
-#endif

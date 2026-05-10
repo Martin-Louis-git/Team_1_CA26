@@ -1,37 +1,7 @@
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-//[["Add","R1","R2","R3"],[],[]]
-// R1  --> "00001"
-// R2  --> "00010"
-// R3  --> "00011"
-// R4  --> "00100"
-// R5  --> "00101"
-// R6  --> "00110"
-// R7  --> "00111"
-// R8  --> "01000"
-// R9  --> "01001"
-// R10 --> "01010"
-// R11 --> "01011"
-// R12 --> "01100"
-// R13 --> "01101"
-// R14 --> "01110"
-// R15 --> "01111"
-// R16 --> "10000"
-// R17 --> "10001"
-// R18 --> "10010"
-// R19 --> "10011"
-// R20 --> "10100"
-// R21 --> "10101"
-// R22 --> "10110"
-// R23 --> "10111"
-// R24 --> "11000"
-// R25 --> "11001"
-// R26 --> "11010"
-// R27 --> "11011"
-// R28 --> "11100"
-// R29 --> "11101"
-// R30 --> "11110"
-// R31 --> "11111"
+#include "../include/instruction.h"
 
 char* BinaryReg(char* Reg){
     if (strcmp(Reg, "R1") == 0)
@@ -133,16 +103,18 @@ char Type(char* Op){
         strcmp(Op,"MUL")==0 ||
         strcmp(Op,"AND")==0 ||
         strcmp(Op,"LSL")==0 ||
-        strcmp(Op,"LSR")==0 ||
-    )
+        strcmp(Op,"LSR")==0 
+    ){
         return 'R';
+    }        
     if (strcmp(Op,"MOVI")==0 ||
         strcmp(Op,"JEQ")==0 ||
         strcmp(Op,"XORI")==0 ||
         strcmp(Op,"MOVR")==0 ||
-        strcmp(Op,"MOVM")==0 ||
-    )
+        strcmp(Op,"MOVM")==0 
+    ){
         return 'I';
+    }
     if(strcmp(Op,"JMP")==0)
         return 'J';
 }
@@ -178,13 +150,15 @@ char* toBinary13(char* numStr) {
     return binary;
 }
 
-char** encode(char*** instructions) {
 
-    char Encoded[sizeof(**instructions)][32];
-    for (int i = 0; i<sizeof(**instructions) ; i++){
+
+void encode(char instructions[][5][5],char Encoded[][33], int size) {
+    
+    
+    for (int i = 0; i<size ; i++){
         //R Format
-        if(type(instructions[i][0]) == 'R'){
-            Encoded[i] = BinaryOpCode(instructions[i][0]);
+        if(Type(instructions[i][0]) == 'R'){
+            strcpy(Encoded[i],BinaryOpCode(instructions[i][0]));
             strcat(Encoded[i],BinaryReg(instructions[i][1])); // R1
             strcat(Encoded[i],BinaryReg(instructions[i][2])); // R2
             if (strcmp(instructions[i][0],"LSL") ==0 || strcmp(instructions[i][0],"LSR") ==0 ){
@@ -196,18 +170,24 @@ char** encode(char*** instructions) {
                 strcat(Encoded[i],"0000000000000"); // SHAMT kolo 0
             }
         }
-        if(type(instructions[i][0]) == 'I'){
-            Encoded[i] = BinaryOpCode(instructions[i][0]);
-            strcat(Encoded[i],BinaryReg(instructions[i][1]));
-            strcat(Encoded[i],BinaryReg(instructions[i][2]));
-            strcat(Encoded[i],toBinary18(instructions[i][3]));
+        if(Type(instructions[i][0]) == 'I'){
+                strcpy(Encoded[i],BinaryOpCode(instructions[i][0]));
+                strcat(Encoded[i],BinaryReg(instructions[i][1]));
+            if (strcmp(instructions[i][0],"MOVI") ==0 ){
+                strcat(Encoded[i],"00000"); 
+                strcat(Encoded[i],toBinary18(instructions[i][2]));
+            }
+            else
+            {
+                strcat(Encoded[i],BinaryReg(instructions[i][2]));
+                strcat(Encoded[i],toBinary18(instructions[i][3]));
+            }
         }
-        if(type(instructions[i][0]) == 'J'){
-            Encoded[i] = BinaryOpCode(instructions[i][0]);
-            strcat(Encoded[i],toBinary18(instructions[i][3]));
-
+        if(Type(instructions[i][0]) == 'J'){
+            strcpy(Encoded[i],BinaryOpCode(instructions[i][0]));
+            strcat(Encoded[i],toBinary28(instructions[i][1]));
         }
 
     }
-    return Encoded;
+    
 }
