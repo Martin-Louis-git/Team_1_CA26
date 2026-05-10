@@ -10,3 +10,9 @@
 # Optional build folders
 build/
 bin/
+.idea/editor.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/Team_1_CA26.iml
+.idea/workspace.xml
+CMakeLists.txt
