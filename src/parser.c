@@ -2,8 +2,9 @@
 #include <string.h>
 #include "../include/parser.h"
 
-void parse(char (*instruction)[5][5])
+int parse(char (*instruction)[5][5])
 {
+
     int ch;
     FILE *file = fopen("IO/input.txt", "r");
 
@@ -50,4 +51,6 @@ void parse(char (*instruction)[5][5])
     }
 
     fclose(file);
+    instructionIndex++;
+    return instructionIndex;
 }
