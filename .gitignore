@@ -1,0 +1,12 @@
+# Executables
+*.exe
+*.out
+*.app
+
+# Object/build files
+*.o
+*.obj
+
+# Optional build folders
+build/
+bin/
