@@ -18,5 +18,7 @@ int main()
 
     CPU cpu = createCPU(encodedInstruction, size);
 
+    run(&cpu);
+
     return 0;
 }

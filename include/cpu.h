@@ -14,4 +14,4 @@ typedef struct CPU
 
 CPU createCPU(char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instructionCount);
 void loadMemory(CPU *cpu, char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instructionCount);
-void print(CPU *cpu);
+void run(CPU *cpu);
