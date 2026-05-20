@@ -1,14 +1,17 @@
 #pragma once
 
 #include "../constants.h"
+#include "registers.h"
+#include "memory.h"
 
 typedef struct CPU
 {
-    int registers[32];
-    char pc[ENCODED_INSTRUCTION_LENGTH];
+    Reg registers[32];
+    Reg pc;
     int clock;
-    char memory[MEMORY_SIZE][ENCODED_INSTRUCTION_LENGTH];
+    Memory memory;
 } CPU;
 
 CPU createCPU(char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instructionCount);
 void loadMemory(CPU *cpu, char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instructionCount);
+void print(CPU *cpu);

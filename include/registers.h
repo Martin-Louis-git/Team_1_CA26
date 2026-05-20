@@ -1,17 +1,19 @@
-#pragma once 
+#pragma once
 
-typedef enum{ 
+typedef enum
+{
     GPRS,
     ZERO,
     PC
 } RegType;
 
-typedef struct{
+typedef struct
+{
     char reg[33];
     RegType regType;
 } Reg;
 
-Reg    reg_new(const char *reg, RegType regType);
-const char   *getRegType(RegType r);
-void  reg_set(Reg *r, const char *newReg, RegType newType);
-Reg   reg_get(const Reg *r);
+Reg reg_new(char *reg, RegType regType);
+const char *getRegType(RegType r);
+void reg_set(Reg *r, char *newReg, RegType newType);
+Reg reg_get(Reg *r);

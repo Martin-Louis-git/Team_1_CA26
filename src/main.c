@@ -4,6 +4,7 @@
 #include "../include/parser.h"
 #include "../include/instruction.h"
 #include "../include/cpu.h"
+#include "../include/memory.h"
 #include "../constants.h"
 
 int main()
@@ -14,6 +15,8 @@ int main()
 
     char encodedInstruction[MAX_INSTRUCTIONS][33] = {};
     encode(instruction, encodedInstruction, size);
+
+    CPU cpu = createCPU(encodedInstruction, size);
 
     return 0;
 }
