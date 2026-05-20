@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "../include/registers.h"
 #include "../include/parser.h"
 #include "../include/instruction.h"
 #include "../include/cpu.h"
@@ -7,16 +8,12 @@
 
 int main()
 {
+
     char instruction[MAX_INSTRUCTIONS][5][5] = {};
     int size = parse(instruction);
 
-    char encodedInstructions[size][ENCODED_INSTRUCTION_LENGTH];
-    memset(encodedInstructions, 0, sizeof(encodedInstructions));
-
-    encode(instruction, encodedInstructions, size);
-
-    CPU cpu = createCPU(encodedInstructions, size);
-    (void)cpu;
+    char encodedInstruction[MAX_INSTRUCTIONS][33] = {};
+    encode(instruction, encodedInstruction, size);
 
     return 0;
 }
