@@ -37,6 +37,7 @@ CPU createCPU(char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instru
         }
     }
     cpu.clock = 0;
+    cpu.logger.size = 0;
 
     loadMemory(&cpu, encodedInstructions, instructionCount);
 
@@ -45,19 +46,19 @@ CPU createCPU(char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instru
 
 void run(CPU *cpu)
 {
-    logger.print_memory();
+    logger_print_memory(&(cpu->memory));
 
     while (1)
     {
         (cpu->clock)++;
-        logger.log(cpu->clock);
+        logger_log(&(cpu->logger), "%d", cpu->clock);
         write_back(); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
         memory();     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
         execute();    // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
         decode();     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
         fetch();      // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        logger.print_log();
+        logger_print(&(cpu->logger));
     }
 
-    logger.print_memory();
+    logger_print_memory(&(cpu->memory));
 }

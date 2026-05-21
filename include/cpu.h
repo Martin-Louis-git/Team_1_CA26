@@ -3,6 +3,7 @@
 #include "../constants.h"
 #include "registers.h"
 #include "memory.h"
+#include "logger.h"
 
 typedef struct CPU
 {
@@ -10,6 +11,7 @@ typedef struct CPU
     Reg pc;
     int clock;
     Memory memory;
+    Logger logger;
 } CPU;
 
 CPU createCPU(char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instructionCount);
