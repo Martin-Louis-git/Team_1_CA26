@@ -9,11 +9,11 @@ typedef enum
 
 typedef struct
 {
-    char reg[33];
+    int value;
     RegType regType;
 } Reg;
 
-Reg reg_new(char *reg, RegType regType);
+Reg reg_new(int value, RegType regType);
 const char *getRegType(RegType r);
-void reg_set(Reg *r, char *newReg, RegType newType);
+void reg_set(Reg *r, int newValue, RegType newType);
 Reg reg_get(Reg *r);

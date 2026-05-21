@@ -17,10 +17,10 @@ const char *getRegType(RegType r)
     }
 }
 
-Reg reg_new(char *reg, RegType regType)
+Reg reg_new(int value, RegType regType)
 {
     Reg r;
-    strcpy(r.reg, reg);
+    r.value = value;
     r.regType = regType;
     return r;
 }
@@ -30,14 +30,13 @@ Reg reg_get(Reg *r)
     return *r;
 }
 
-void reg_set(Reg *r, char *newReg, RegType newType)
+void reg_set(Reg *r, int newValue, RegType newType)
 {
     if (r->regType == ZERO)
     {
         printf("Error: cannot modify the zero register\n");
         return;
     }
-    strncpy(r->reg, newReg, sizeof(r->reg) - 1);
-    r->reg[sizeof(r->reg) - 1] = '\0';
+    r->value = newValue;
     r->regType = newType;
 }

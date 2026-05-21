@@ -23,17 +23,16 @@ CPU createCPU(char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instru
 {
     CPU cpu;
 
-    char zeroValue[33] = "00000000000000000000000000000000";
-    cpu.pc = reg_new(zeroValue, PC);
+    cpu.pc = reg_new(0, PC);
     for (int i = 0; i < 32; i++)
     {
         if (i == 0)
         {
-            cpu.registers[i] = reg_new(zeroValue, ZERO);
+            cpu.registers[i] = reg_new(0, ZERO);
         }
         else
         {
-            cpu.registers[i] = reg_new(zeroValue, GPRS);
+            cpu.registers[i] = reg_new(0, GPRS);
         }
     }
     cpu.clock = 0;
