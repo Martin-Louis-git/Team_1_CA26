@@ -47,16 +47,16 @@ void run(CPU *cpu)
 {
     logger_print_memory(&(cpu->memory));
 
-    while (1)
+    while (m_read(&(cpu->memory), reg_get(&(cpu->pc))) != NULL && m_read(&(cpu->memory), reg_get(&(cpu->pc)))[0] != '\0')
     {
         (cpu->clock)++;
-        logger_log(&(cpu->logger), "%d", cpu->clock);
-        write_back(&cpu); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        memory(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        execute(&cpu);    // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        decode(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        fetch(&cpu);      // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        logger_print(&(cpu->logger));
+        logger_log(&(cpu->logger), "At Clock %d, ", cpu->clock);
+        // write_back(&cpu); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        // memory(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        // execute(&cpu);    // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        // decode(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        fetch(cpu); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        logger_print_log(&(cpu->logger));
     }
 
     logger_print_memory(&(cpu->memory));

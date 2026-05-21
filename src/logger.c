@@ -30,6 +30,8 @@ void logger_print_log(Logger *logger)
 {
     for (int i = 0; i < logger->size; i++)
     {
-        printf("%s\n", logger->log[i]);
+        printf("%s", logger->log[i]);
     }
+    printf("\n");
+    logger->size = 0;
 }
