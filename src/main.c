@@ -2,7 +2,7 @@
 #include <string.h>
 #include "../include/registers.h"
 #include "../include/parser.h"
-#include "../include/instruction.h"
+#include "../include/Instruction.h"
 #include "../include/cpu.h"
 #include "../include/memory.h"
 #include "../constants.h"
