@@ -13,6 +13,7 @@ typedef struct
     char type;
     int immediate;
     int shamt;
+    int address; // for load/store instructions
 
     // execute stage
     int result;
@@ -20,4 +21,5 @@ typedef struct
     int write_to_pc;  // boolean 0 or 1
     int mem_read;     // int 0 for neither, 1 for load, 2 for store
     int memAddress;
+    
 } InstructionPacket;
