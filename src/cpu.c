@@ -51,11 +51,11 @@ void run(CPU *cpu)
     {
         (cpu->clock)++;
         logger_log(&(cpu->logger), "%d", cpu->clock);
-        write_back(); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        memory();     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        execute();    // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        decode();     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        fetch();      // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        write_back(&cpu); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        memory(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        execute(&cpu);    // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        decode(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        fetch(&cpu);      // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
         logger_print(&(cpu->logger));
     }
 

@@ -25,9 +25,9 @@ Reg reg_new(int value, RegType regType)
     return r;
 }
 
-Reg reg_get(Reg *r)
+int reg_get(Reg *r)
 {
-    return *r;
+    return r->value;
 }
 
 void reg_set(Reg *r, int newValue, RegType newType)

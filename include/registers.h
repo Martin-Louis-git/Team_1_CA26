@@ -16,4 +16,4 @@ typedef struct
 Reg reg_new(int value, RegType regType);
 const char *getRegType(RegType r);
 void reg_set(Reg *r, int newValue, RegType newType);
-Reg reg_get(Reg *r);
+int reg_get(Reg *r);
