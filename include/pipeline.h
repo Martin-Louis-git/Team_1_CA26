@@ -12,4 +12,4 @@ void fetch(CPU *cpu);
 void decode(CPU *cpu);
 void execute(CPU *cpu);
 void memory(CPU *cpu);
-void write_back(CPU *cpu);
+int write_back(CPU *cpu);

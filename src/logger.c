@@ -28,7 +28,7 @@ void logger_print_memory(Memory *memory)
 
 void logger_print_log(Logger *logger)
 {
-    for (int i = 0; i < logger->size; i++)
+    for (int i = logger->size - 1; i >= 0; i--)
     {
         printf("%s", logger->log[i]);
     }

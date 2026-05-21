@@ -3,6 +3,7 @@
 typedef struct
 {
     // fetch stage
+    int instructionNum;
     char instruction[33];
 
     // decode stage
@@ -21,5 +22,6 @@ typedef struct
     int write_to_pc;  // boolean 0 or 1
     int mem_read;     // int 0 for neither, 1 for load, 2 for store
     int memAddress;
-    
+
+    int finished;
 } InstructionPacket;

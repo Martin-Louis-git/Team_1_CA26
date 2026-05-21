@@ -45,19 +45,19 @@ CPU createCPU(char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instru
 
 void run(CPU *cpu)
 {
-    logger_print_memory(&(cpu->memory));
-
-    while (m_read(&(cpu->memory), reg_get(&(cpu->pc))) != NULL && m_read(&(cpu->memory), reg_get(&(cpu->pc)))[0] != '\0')
+    // logger_print_memory(&(cpu->memory));
+    int loop = 1;
+    while (loop)
     {
         (cpu->clock)++;
+        loop = write_back(cpu); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        memory(cpu);            // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        execute(cpu);           // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        decode(cpu);            // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
+        fetch(cpu);             // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
         logger_log(&(cpu->logger), "At Clock %d, ", cpu->clock);
-        // write_back(&cpu); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        // memory(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        // execute(&cpu);    // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        // decode(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        fetch(cpu); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
         logger_print_log(&(cpu->logger));
     }
 
-    logger_print_memory(&(cpu->memory));
+    // logger_print_memory(&(cpu->memory));
 }
