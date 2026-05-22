@@ -263,8 +263,58 @@ void execute(CPU *cpu)
 
 void memory(CPU *cpu)
 {
+   if (execute_memory == NULL || cpu->clock % 2 != 0)
+        return;
 
-    execute_memory = NULL;
+    logger_log(&(cpu->logger), "Memory instruction: %d, ",
+            execute_memory->instructionNum);
+
+   if (execute_memory->mem_read == 1)
+   {
+        char *val = m_read(&(cpu->memory),
+                    execute_memory->memAddress);
+
+      if (val != NULL && val[0] != '\0')
+        {
+            execute_memory->result =
+                    (int) strtol(val, NULL, 2);
+
+          logger_log(&(cpu->logger),
+             "Memory read at address %d: %d, ",
+               execute_memory->memAddress,
+                    execute_memory->result);
+        }
+        else
+      {
+           execute_memory->result = 0;
+      }
+    }
+
+      else if (execute_memory->mem_read == 2)
+    {
+        char binary[33];
+          int val = execute_memory->result;
+
+        for (int i = 31; i >= 0; i--)
+        {
+              binary[31 - i] =
+                    ((val >> i) & 1) ? '1' : '0';
+        }
+
+         binary[32] = '\0';
+
+        m_write(&(cpu->memory),
+             execute_memory->memAddress,
+                    binary);
+
+          logger_log(&(cpu->logger),
+              "Memory write at address %d: %d, ",
+                    execute_memory->memAddress,
+                        execute_memory->result);
+    }
+
+      memory_write_back = execute_memory;
+   execute_memory = NULL;
 }
 
 int write_back(CPU *cpu)
