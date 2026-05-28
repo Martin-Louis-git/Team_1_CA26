@@ -32,7 +32,7 @@ void fetch(CPU *cpu)
 
     int value = reg_get(&(cpu->pc));
 
-    reg_set(&(cpu->pc), value + 1, PC);
+    reg_set(&(cpu->pc), value + 1);
 
     fetch_decode->instructionNum = value + 1;
     fetch_decode->finished = 1;
@@ -84,6 +84,7 @@ void decode(CPU *cpu)
 
     Reg *passR1 = &(cpu->registers[r1]);
     decode_execute->r1 = passR1;
+    printf("R1: %d, R1 type: %s\n", reg_get(passR1), getRegType(passR1));
     Reg *passR2 = &(cpu->registers[r2]);
     decode_execute->r2 = passR2;
     Reg *passR3 = &(cpu->registers[r3]);
@@ -335,13 +336,20 @@ int write_back(CPU *cpu)
         if (memory_write_back->r1 != NULL)
         {
             int oldValue = reg_get(memory_write_back->r1);
-            reg_set(memory_write_back->r1, memory_write_back->result, memory_write_back->r1->regType);
-            logger_log(
-                &(cpu->logger),
-                "R%d old value: %d -> new value: %d.\n",
-                (int)(memory_write_back->r1 - memory_write_back->initialAddress),
-                oldValue,
-                reg_get(memory_write_back->r1));
+            if (memory_write_back->r1->regType != ZERO)
+            {
+                reg_set(memory_write_back->r1, memory_write_back->result);
+                logger_log(
+                    &(cpu->logger),
+                    "R%d old value: %d -> new value: %d.\n",
+                    (int)(memory_write_back->r1 - memory_write_back->initialAddress),
+                    oldValue,
+                    reg_get(memory_write_back->r1));
+            }
+            else
+            {
+                logger_log(&(cpu->logger), "Cannot write to ZERO register.\n");
+            }
         }
         else
         {
@@ -352,7 +360,7 @@ int write_back(CPU *cpu)
     if (memory_write_back->write_to_pc == 1)
     {
         int oldPc = reg_get(&(cpu->pc));
-        reg_set(&(cpu->pc), memory_write_back->result, PC);
+        reg_set(&(cpu->pc), memory_write_back->result);
         logger_log(&(cpu->logger), "PC old Value: %d -> PC new Value %d.\n", oldPc, reg_get(&(cpu->pc)));
     }
 

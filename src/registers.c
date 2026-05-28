@@ -2,9 +2,9 @@
 #include <string.h>
 #include "../include/registers.h"
 
-const char *getRegType(RegType r)
+const char *getRegType(Reg *r)
 {
-    switch (r)
+    switch (r->regType)
     {
     case GPRS:
         return "GPRS";
@@ -30,7 +30,7 @@ int reg_get(Reg *r)
     return r->value;
 }
 
-void reg_set(Reg *r, int newValue, RegType newType)
+void reg_set(Reg *r, int newValue)
 {
     if (r->regType == ZERO)
     {
@@ -38,5 +38,4 @@ void reg_set(Reg *r, int newValue, RegType newType)
         return;
     }
     r->value = newValue;
-    r->regType = newType;
 }
