@@ -80,11 +80,10 @@ void decode(CPU *cpu)
     int im = (instruction) & 0b00000000000000111111111111111111;
     decode_execute->immediate = im;
     int ad = (instruction) & 0b00001111111111111111111111111111;
-    decode_execute->memAddress = ad;
+    decode_execute->address = ad;
 
     Reg *passR1 = &(cpu->registers[r1]);
     decode_execute->r1 = passR1;
-    printf("R1: %d, R1 type: %s\n", reg_get(passR1), getRegType(passR1));
     Reg *passR2 = &(cpu->registers[r2]);
     decode_execute->r2 = passR2;
     Reg *passR3 = &(cpu->registers[r3]);
@@ -178,15 +177,16 @@ void execute(CPU *cpu)
         // Compare R1 and R2, and if they are equal, jump by IMM instructions
         if (reg_get(execute_memory->r1) == reg_get(execute_memory->r2))
         {
-            execute_memory->result = reg_get(&(cpu->pc)) + execute_memory->immediate;
-            execute_memory->write_to_reg = 0;
-            execute_memory->write_to_pc = 1;
-            execute_memory->mem_read = 0;
-            execute_memory->memAddress = 0;
+            execute_memory->result = reg_get(&(cpu->pc)) + execute_memory->immediate - 1;
+
+            int oldPc = reg_get(&(cpu->pc));
+            reg_set(&(cpu->pc), execute_memory->result);
+            logger_log(&(cpu->logger), "PC old Value: %d -> PC new Value %d.\n", oldPc, reg_get(&(cpu->pc)));
 
             // CLEAR EVERYTHING BEFORE THAT
             fetch_decode = NULL;
             decode_execute = NULL;
+            execute_memory = NULL;
         }
         else
         {
@@ -218,15 +218,16 @@ void execute(CPU *cpu)
 
     case 7:
         // Jump to the specified address
-        execute_memory->result = (reg_get(&(cpu->pc)) & 0xF0000000) | (execute_memory->address & 0x0FFFFFFF);
-        ;
-        execute_memory->write_to_reg = 0;
-        execute_memory->write_to_pc = 1;
-        execute_memory->mem_read = 0;
-        execute_memory->memAddress = 0;
+        execute_memory->result = ((reg_get(&(cpu->pc)) & 0xF0000000) | (execute_memory->address & 0x0FFFFFFF)) - 1;
+
+        int oldPc = reg_get(&(cpu->pc));
+        reg_set(&(cpu->pc), execute_memory->result);
+        logger_log(&(cpu->logger), "PC old Value: %d -> PC new Value %d.\n", oldPc, reg_get(&(cpu->pc)));
+
         // CLEAR EVERYTHING BEFORE THAT
         fetch_decode = NULL;
         decode_execute = NULL;
+        execute_memory = NULL;
         break;
 
     case 8:
@@ -315,10 +316,10 @@ void memory(CPU *cpu)
                    "Memory write at address %d: %d.\n",
                    execute_memory->memAddress,
                    execute_memory->result);
-
-        logger_log(&(cpu->logger), "Memory instruction: %d.\n",
-                   execute_memory->instructionNum);
     }
+
+    logger_log(&(cpu->logger), "Memory instruction: %d.\n",
+               execute_memory->instructionNum);
 
     memory_write_back = execute_memory;
     execute_memory = NULL;
