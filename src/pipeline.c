@@ -18,10 +18,16 @@ void fetch(CPU *cpu)
         return;
     }
 
-    fetch_decode = malloc(sizeof(InstructionPacket));
-
     char *instruction = m_read(&(cpu->memory), reg_get(&(cpu->pc)));
+
+    if (instruction == NULL || instruction[0] == '\0')
+    {
+        return;
+    }
+
+    fetch_decode = malloc(sizeof(InstructionPacket));
     strncpy(fetch_decode->instruction, instruction, 33);
+
     fetch_decode->instruction[32] = '\0';
 
     int value = reg_get(&(cpu->pc));
@@ -30,7 +36,8 @@ void fetch(CPU *cpu)
 
     fetch_decode->instructionNum = value + 1;
     fetch_decode->finished = 1;
-    logger_log(&(cpu->logger), "Fetch instruction: %d, ", (cpu->pc).value);
+    fetch_decode->initialAddress = cpu->registers; // initial memory address of registers
+    logger_log(&(cpu->logger), "Fetch instruction: %d.\n", (cpu->pc).value);
 }
 
 void decode(CPU *cpu)
@@ -40,7 +47,7 @@ void decode(CPU *cpu)
         return;
     }
 
-    logger_log(&(cpu->logger), "Decode instruction: %d, ", fetch_decode->instructionNum);
+    logger_log(&(cpu->logger), "Decode instruction: %d.\n", fetch_decode->instructionNum);
 
     if (fetch_decode->finished > 0)
     {
@@ -55,10 +62,10 @@ void decode(CPU *cpu)
     strncpy(bits, decode_execute->instruction, 33);
     bits[32] = '\0';
 
-    unsigned int instruction = (unsigned int)strtol(bits, NULL, 2);
+    unsigned int instruction = (unsigned int)strtoul(bits, NULL, 2);
 
-    int op = (instruction) & 0b11110000000000000000000000000000;
-    op = op >> 28;
+    unsigned int op =
+        ((unsigned int)instruction & 0xF0000000) >> 28;
     decode_execute->opcode = op;
 
     int r1 = (instruction) & 0b00001111100000000000000000000000;
@@ -118,7 +125,7 @@ void execute(CPU *cpu)
         return;
     }
 
-    logger_log(&(cpu->logger), "Execute instruction: %d, ", decode_execute->instructionNum);
+    logger_log(&(cpu->logger), "Execute instruction: %d.\n", decode_execute->instructionNum);
 
     if (decode_execute->finished > 0)
     {
@@ -258,63 +265,62 @@ void execute(CPU *cpu)
         break;
     }
     decode_execute = NULL;
-    // printf("result: %d, write_to_reg: %d, write_to_pc: %d, mem_read: %d, memAddress: %d\n", execute_memory->result, execute_memory->write_to_reg, execute_memory->write_to_pc, execute_memory->mem_read, execute_memory->memAddress);
 }
 
 void memory(CPU *cpu)
 {
-   if (execute_memory == NULL || cpu->clock % 2 != 0)
+    if (execute_memory == NULL || cpu->clock % 2 != 0)
         return;
 
-    logger_log(&(cpu->logger), "Memory instruction: %d, ",
-            execute_memory->instructionNum);
-
-   if (execute_memory->mem_read == 1)
-   {
+    if (execute_memory->mem_read == 1)
+    {
         char *val = m_read(&(cpu->memory),
-                    execute_memory->memAddress);
+                           execute_memory->memAddress);
 
-      if (val != NULL && val[0] != '\0')
+        if (val != NULL && val[0] != '\0')
         {
             execute_memory->result =
-                    (int) strtol(val, NULL, 2);
+                (int)strtol(val, NULL, 2);
 
-          logger_log(&(cpu->logger),
-             "Memory read at address %d: %d, ",
-               execute_memory->memAddress,
-                    execute_memory->result);
+            logger_log(&(cpu->logger),
+                       "Memory read at address %d: %d.\n",
+                       execute_memory->memAddress,
+                       execute_memory->result);
         }
         else
-      {
-           execute_memory->result = 0;
-      }
+        {
+            execute_memory->result = 0;
+        }
     }
 
-      else if (execute_memory->mem_read == 2)
+    else if (execute_memory->mem_read == 2)
     {
         char binary[33];
-          int val = execute_memory->result;
+        int val = execute_memory->result;
 
         for (int i = 31; i >= 0; i--)
         {
-              binary[31 - i] =
-                    ((val >> i) & 1) ? '1' : '0';
+            binary[31 - i] =
+                ((val >> i) & 1) ? '1' : '0';
         }
 
-         binary[32] = '\0';
+        binary[32] = '\0';
 
         m_write(&(cpu->memory),
-             execute_memory->memAddress,
-                    binary);
+                execute_memory->memAddress,
+                binary);
 
-          logger_log(&(cpu->logger),
-              "Memory write at address %d: %d, ",
-                    execute_memory->memAddress,
-                        execute_memory->result);
+        logger_log(&(cpu->logger),
+                   "Memory write at address %d: %d.\n",
+                   execute_memory->memAddress,
+                   execute_memory->result);
+
+        logger_log(&(cpu->logger), "Memory instruction: %d.\n",
+                   execute_memory->instructionNum);
     }
 
-      memory_write_back = execute_memory;
-   execute_memory = NULL;
+    memory_write_back = execute_memory;
+    execute_memory = NULL;
 }
 
 int write_back(CPU *cpu)
@@ -324,8 +330,6 @@ int write_back(CPU *cpu)
         return 1;
     }
 
-    logger_log(&(cpu->logger), "Write back: %s", memory_write_back->instruction);
-
     if (memory_write_back->write_to_reg == 1)
     {
         if (memory_write_back->r1 != NULL)
@@ -334,13 +338,14 @@ int write_back(CPU *cpu)
             reg_set(memory_write_back->r1, memory_write_back->result, memory_write_back->r1->regType);
             logger_log(
                 &(cpu->logger),
-                "Register write: %d -> %d",
+                "R%d old value: %d -> new value: %d.\n",
+                (int)(memory_write_back->r1 - memory_write_back->initialAddress),
                 oldValue,
                 reg_get(memory_write_back->r1));
         }
         else
         {
-            logger_log(&(cpu->logger), "Register write skipped: destination register is NULL");
+            logger_log(&(cpu->logger), "Register write skipped: destination register is NULL.\n");
         }
     }
 
@@ -348,9 +353,10 @@ int write_back(CPU *cpu)
     {
         int oldPc = reg_get(&(cpu->pc));
         reg_set(&(cpu->pc), memory_write_back->result, PC);
-        logger_log(&(cpu->logger), "PC write: %d -> %d", oldPc, reg_get(&(cpu->pc)));
+        logger_log(&(cpu->logger), "PC old Value: %d -> PC new Value %d.\n", oldPc, reg_get(&(cpu->pc)));
     }
 
+    logger_log(&(cpu->logger), "Write back Instruction: %d.\n", memory_write_back->instructionNum);
     memory_write_back = NULL;
 
     if (fetch_decode == NULL && decode_execute == NULL && execute_memory == NULL)

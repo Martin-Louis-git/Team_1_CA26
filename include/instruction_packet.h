@@ -24,4 +24,5 @@ typedef struct
     int memAddress;
 
     int finished;
+    Reg *initialAddress;
 } InstructionPacket;
