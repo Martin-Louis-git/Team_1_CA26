@@ -34,7 +34,7 @@ void reg_set(Reg *r, int newValue)
 {
     if (r->regType == ZERO)
     {
-        printf("Error: cannot modify the zero register\n");
+        r->value =0;
         return;
     }
     r->value = newValue;

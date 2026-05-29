@@ -124,12 +124,13 @@ char Type(char *Op)
 char *toBinary18(char *numStr)
 {
     int num = atoi(numStr);
+    unsigned int value = ((unsigned int)num) & 0x3FFFF;
     static char binary[19];
     binary[18] = '\0';
+
     for (int i = 17; i >= 0; i--)
     {
-        binary[i] = (num % 2) + '0';
-        num /= 2;
+        binary[17 - i] = ((value >> i) & 1) + '0';
     }
     return binary;
 }
@@ -140,11 +141,11 @@ char *toBinary28(char *numStr)
     binary[28] = '\0';
     for (int i = 27; i >= 0; i--)
     {
-        binary[i] = (num % 2) + '0';
-        num /= 2;
+        binary[27 - i] = ((num >> i) & 1) + '0';
     }
     return binary;
 }
+
 char *toBinary13(char *numStr)
 {
     int num = atoi(numStr);
@@ -158,7 +159,7 @@ char *toBinary13(char *numStr)
     return binary;
 }
 
-void encode(char instructions[][5][5], char Encoded[][33], int size)
+void encode(char instructions[][5][20], char Encoded[][33], int size)
 {
 
     for (int i = 0; i < size; i++)

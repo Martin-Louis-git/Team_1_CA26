@@ -2,14 +2,14 @@
 #include <string.h>
 #include "../include/parser.h"
 
-int parse(char (*instruction)[5][5])
+int parse(char (*instruction)[5][20])
 {
 
     int ch;
     FILE *file = fopen("IO/input.txt", "r");
 
-    char word[5] = "";
-    char line[5][5] = {};
+    char word[20] = "";
+    char line[5][20] = {};
 
     int wordIndex = 0;
     int lineIndex = 0;
@@ -24,7 +24,7 @@ int parse(char (*instruction)[5][5])
             word[0] = '\0';
             wordIndex = 0;
             lineIndex = 0;
-            memcpy(line, (char[5][5]){{}}, sizeof(line));
+            memcpy(line, (char[5][20]){{}}, sizeof(line));
             instructionIndex++;
         }
         else

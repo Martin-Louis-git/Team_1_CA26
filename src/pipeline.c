@@ -64,8 +64,7 @@ void decode(CPU *cpu)
 
     unsigned int instruction = (unsigned int)strtoul(bits, NULL, 2);
 
-    unsigned int op =
-        ((unsigned int)instruction & 0xF0000000) >> 28;
+    unsigned int op = ((unsigned int)instruction & 0xF0000000) >> 28;
     decode_execute->opcode = op;
 
     int r1 = (instruction) & 0b00001111100000000000000000000000;
@@ -78,8 +77,13 @@ void decode(CPU *cpu)
     decode_execute->shamt = sh;
 
     int im = (instruction) & 0b00000000000000111111111111111111;
+    if (im & (1 << 17))
+    {
+        im |= ~0x0003FFFF;
+    }
     decode_execute->immediate = im;
-    int ad = (instruction) & 0b00001111111111111111111111111111;
+
+    int ad = instruction & 0x0FFFFFFF;  
     decode_execute->address = ad;
 
     Reg *passR1 = &(cpu->registers[r1]);
@@ -218,7 +222,7 @@ void execute(CPU *cpu)
 
     case 7:
         // Jump to the specified address
-        execute_memory->result = ((reg_get(&(cpu->pc)) & 0xF0000000) | (execute_memory->address & 0x0FFFFFFF)) - 1;
+        execute_memory->result = ((reg_get(&(cpu->pc)) & 0xF0000000) | (execute_memory->address & 0x0FFFFFFF)) ;
 
         int oldPc = reg_get(&(cpu->pc));
         reg_set(&(cpu->pc), execute_memory->result);
@@ -281,8 +285,8 @@ void memory(CPU *cpu)
 
         if (val != NULL && val[0] != '\0')
         {
-            execute_memory->result =
-                (int)strtol(val, NULL, 2);
+            unsigned int raw = (unsigned int)strtoul(val, NULL, 2);
+            execute_memory->result = (int)raw;
 
             logger_log(&(cpu->logger),
                        "Memory read at address %d: %d.\n",
@@ -349,7 +353,13 @@ int write_back(CPU *cpu)
             }
             else
             {
-                logger_log(&(cpu->logger), "Cannot write to ZERO register.\n");
+                reg_set(memory_write_back->r1, memory_write_back->result);
+                logger_log(
+                    &(cpu->logger),
+                    "R%d old value: %d -> new value: %d.\n",
+                    (int)(memory_write_back->r1 - memory_write_back->initialAddress),
+                    oldValue,
+                    reg_get(memory_write_back->r1));
             }
         }
         else
