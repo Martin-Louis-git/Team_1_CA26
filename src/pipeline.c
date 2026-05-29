@@ -47,8 +47,6 @@ void decode(CPU *cpu)
         return;
     }
 
-    logger_log(&(cpu->logger), "Decode instruction: %d.\n", fetch_decode->instructionNum);
-
     if (fetch_decode->finished > 0)
     {
         fetch_decode->finished--;
@@ -83,7 +81,7 @@ void decode(CPU *cpu)
     }
     decode_execute->immediate = im;
 
-    int ad = instruction & 0x0FFFFFFF;  
+    int ad = instruction & 0x0FFFFFFF;
     decode_execute->address = ad;
 
     Reg *passR1 = &(cpu->registers[r1]);
@@ -118,6 +116,47 @@ void decode(CPU *cpu)
     default:
         break;
     }
+    switch (op)
+    {
+    case 0: // ADD
+    case 1: // SUB
+    case 2: // MUL
+    case 5: // AND
+        logger_log(&(cpu->logger),
+                   "OP=%d R1=R%d R2=R%d R3=R%d.\n",
+                   op, r1, r2, r3);
+        break;
+
+    case 3: // MOVI
+        logger_log(&(cpu->logger),
+                   "OP=%d R1=R%d IMM=%d.\n",
+                   op,
+                   r1, im);
+        break;
+
+    case 4:  // JEQ
+    case 6:  // XORI
+    case 10: // MOVR
+    case 11: // MOVM
+        logger_log(&(cpu->logger),
+                   "OP=%d R1=R%d R2=R%d IMM=%d.\n",
+                   op, r1, r2, im);
+        break;
+
+    case 7: // JMP
+        logger_log(&(cpu->logger),
+                   "OP=%d ADDRESS=%d.\n",
+                   op, ad);
+        break;
+
+    case 8: // LSL
+    case 9: // LSR
+        logger_log(&(cpu->logger),
+                   "OP=%d R1=R%d R2=R%d SHAMT=%d.\n",
+                   op, r1, r2, sh);
+        break;
+    }
+    logger_log(&(cpu->logger), "Decode instruction: %d.\n", fetch_decode->instructionNum);
     fetch_decode = NULL;
 }
 
@@ -222,7 +261,7 @@ void execute(CPU *cpu)
 
     case 7:
         // Jump to the specified address
-        execute_memory->result = ((reg_get(&(cpu->pc)) & 0xF0000000) | (execute_memory->address & 0x0FFFFFFF)) ;
+        execute_memory->result = ((reg_get(&(cpu->pc)) & 0xF0000000) | (execute_memory->address & 0x0FFFFFFF));
 
         int oldPc = reg_get(&(cpu->pc));
         reg_set(&(cpu->pc), execute_memory->result);
@@ -245,7 +284,9 @@ void execute(CPU *cpu)
 
     case 9:
         // Shift the value in R2 right logically by SHAMT bits, then store the result in R1
-        execute_memory->result = reg_get(execute_memory->r2) >> execute_memory->shamt;
+        int result = reg_get(execute_memory->r2) >> execute_memory->shamt;
+        result = result & ~(1 << ((32 - execute_memory->shamt))); // Logical shift right
+        execute_memory->result = result;
         execute_memory->write_to_reg = 1;
         execute_memory->write_to_pc = 0;
         execute_memory->mem_read = 0; // int 0 for neither, 1 for load, 2 for store
