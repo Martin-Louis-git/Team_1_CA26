@@ -45,19 +45,19 @@ CPU createCPU(char encodedInstructions[][ENCODED_INSTRUCTION_LENGTH], int instru
 
 void run(CPU *cpu)
 {
-    logger_print_memory(&(cpu->memory));
-
-    while (1)
+    int loop = 1;
+    while (loop)
     {
         (cpu->clock)++;
-        logger_log(&(cpu->logger), "%d", cpu->clock);
-        write_back(&cpu); // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        memory(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        execute(&cpu);    // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        decode(&cpu);     // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        fetch(&cpu);      // logs current instructions and registers (before and after execution) and memory (when changed) when allowed and instruction exists
-        logger_print(&(cpu->logger));
+        loop = write_back(cpu);
+        memory(cpu);
+        execute(cpu);
+        decode(cpu);
+        fetch(cpu);
+        logger_log(&(cpu->logger), "At Clock %d:\n", cpu->clock);
+        logger_print_log(&(cpu->logger));
     }
 
-    logger_print_memory(&(cpu->memory));
+    logger_save_memory(&(cpu->memory), "IO/output_memory.txt");
+    logger_save_registers(cpu->registers, &cpu->pc, "IO/output_registers.txt");
 }

@@ -1,3 +1,3 @@
 #pragma once
 
-int parse(char instruction[][5][5]);
+int parse(char instruction[][5][20]);
